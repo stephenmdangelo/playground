@@ -1,0 +1,21 @@
+<html>
+    <head>
+        <script type="text/javascript" src="qrc:///qtwebchannel/qwebchannel.js"></script>
+        <script type="text/javascript">
+            new QWebChannel(qt.webChannelTransport, function (channel) {
+                    var vue = channel.objects.vue
+                    vue.co_pilot_started.connect(function() {
+                        console.log("web: co-pilot started")
+                    })
+                    vue.co_pilot_finished.connect(function() {
+                        console.log("web: co-pilot finished")
+                        console.log("web: sending co-pilot response")
+                        vue.co_pilot_response("READY CAMERA 1")
+                    })
+            });
+        </script>
+    </head>
+    <body style="background-color: light-blue;">
+        <h1>VUE Web</h1>
+    </body>
+</html>
