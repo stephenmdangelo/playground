@@ -15,16 +15,22 @@ Item {
         // To be connected to in VUE Web
         signal co_pilot_started()
         signal co_pilot_finished()
-        signal remote_client_finished()
+        signal remote_client_finished(string host)
+        signal remote_client_ping(string host)
 
         // To be called from VUE Web
         function co_pilot_response(response) {
-            co_pilot_response_received(response)
+            console.log("web_channel_interface.co_pilot_response.", "Response", response)
         }
-        signal co_pilot_response_received(string response)
 
-        function connect_remote_client(ip, supports_co_pilot) {
-            console.log("Connecting to remote client...", ip, co_pilot)
+        function co_pilot_recording_level(level) {
+            console.log("web_channel_interface.co_pilot_recording_level.", "Level", level)
+        }
+
+        function connect_remote_client(host, supports_co_pilot) {
+            console.log("web_channel_interface.connect_remote_client.", "Host", host, "Co-Pilot", supports_co_pilot)
+            finish_button.host = host
+            co_pilot_button.enabled = supports_co_pilot
         }
     }
 
@@ -34,10 +40,24 @@ Item {
         anchors.top: parent.top
 
         Controls.Button {
+            id: finish_button
+            enabled: !!host
+            onClicked: {
+                web_channel_interface.remote_client_finished(host)
+                co_pilot_button.enabled = false
+                host = ""
+            }
+            onReleased: web_channel_interface.co_pilot_finished()
+            text: "Finish controlling " + host
+            property string host
+        }
+
+        Controls.Button {
             id: co_pilot_button
             onPressed: web_channel_interface.co_pilot_started()
             onReleased: web_channel_interface.co_pilot_finished()
             text: "Co-Pilot"
+            enabled: false
         }
 
         Text {
@@ -59,7 +79,7 @@ Item {
 
     WebEngineView {
         id: webview
-        url: "webchannel.html"
+        url: "https://beta.bravobyevertz.com"
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
